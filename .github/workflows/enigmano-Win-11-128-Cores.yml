@@ -66,8 +66,15 @@ jobs:
       - name: ⚔️ Execute EnigMano Instance Script
         shell: pwsh
         run: |
-          Write-Host "🚦 Initiating EnigMano-Instance.ps1 with region $env:REGION"
-          powershell.exe -ExecutionPolicy Bypass -File ".\EnigMano-Instance.ps1" -Region $env:REGION
+          Write-Host "🚦 Initiating EnigMano-Instance.ps1"
+          powershell.exe -ExecutionPolicy Bypass -File ".\EnigMano-Instance.ps1"
+
+      - name: 🚀 Start ngrok with fixed region
+        shell: pwsh
+        run: |
+          Write-Host "🌏 Starting ngrok with region: $env:REGION"
+          & ngrok.exe authtoken $env:NGROK_SHAHZAIB
+          Start-Process -NoNewWindow -FilePath "ngrok.exe" -ArgumentList "tcp --region $env:REGION 3389"
 
       - name: 💠 Final Status
         if: always()
