@@ -52,10 +52,15 @@ Log "Using fixed region: $region"
 
 Get-Process ngrok -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Start-Process -FilePath .\ngrok.exe -ArgumentList "tcp --region $region 3389" -WindowStyle Hidden
-Start-Sleep -Seconds 10
+
+# ⏳ Chờ lâu hơn để ngrok khởi động
+Start-Sleep -Seconds 20
 
 try {
+    # Debug: xem log API
     $resp = Invoke-RestMethod -Uri "http://127.0.0.1:4040/api/tunnels"
+    Log "Ngrok API response: $($resp | ConvertTo-Json -Depth 3 -Compress)"
+
     $tunnel = ($resp.tunnels | Where-Object { $_.proto -eq "tcp" }).public_url
     if (-not $tunnel) {
         Fail "Ngrok tunnel creation failed in region $region"
@@ -63,7 +68,6 @@ try {
 } catch {
     Fail "Ngrok API unreachable: $_"
 }
-
 # === SOFTWARE INSTALLATION DEPLOYMENTS ===
 
 try {
